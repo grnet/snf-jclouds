@@ -29,7 +29,6 @@ import java.util.Set;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NovaComputeTest {
     private NovaApi novaApi;
-    private String zone;
     private FlavorApi flavorApi;
     private ImageApi imageApi;
     private ServerApi serverApi;
@@ -44,7 +43,7 @@ public class NovaComputeTest {
             buildApi(NovaApi.class);
 
         final Set<String> zones = novaApi.getConfiguredZones();
-        this.zone = zones.iterator().next();
+        final String zone = zones.iterator().next();
 
         Assert.assertEquals("openstack-nova", zone);
 
