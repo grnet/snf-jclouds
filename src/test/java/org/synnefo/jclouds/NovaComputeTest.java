@@ -45,7 +45,7 @@ public class NovaComputeTest {
         final Set<String> zones = novaApi.getConfiguredZones();
         final String zone = zones.iterator().next();
 
-        Assert.assertEquals("openstack-nova", zone);
+        Assert.assertEquals("default", zone);
 
         this.flavorApi = novaApi.getFlavorApiForZone(zone);
         System.out.println("flavorApi = " + flavorApi);
