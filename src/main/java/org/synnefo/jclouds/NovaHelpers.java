@@ -25,6 +25,16 @@ public final class NovaHelpers {
         return serverApi.get(serverID);
     }
 
+    public void deleteServerAndWait(
+        String serverID,
+        long callDelayMillis,
+        Proc<Server.Status> step
+    ) throws InterruptedException {
+
+        serverApi.delete(serverID);
+        waitServerStatus(serverID, Server.Status.DELETED, callDelayMillis, step);
+    }
+
     public Server.Status waitServerStatuses(
         String serverID,
         EnumSet<Server.Status> allowed,
