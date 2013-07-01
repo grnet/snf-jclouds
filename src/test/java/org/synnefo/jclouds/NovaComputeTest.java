@@ -18,7 +18,6 @@ import org.jclouds.openstack.v2_0.domain.Resource;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
 
-import java.util.Date;
 import java.util.Set;
 
 /**
@@ -32,6 +31,7 @@ public class NovaComputeTest {
     private FlavorApi flavorApi;
     private ImageApi imageApi;
     private ServerApi serverApi;
+    private NovaHelpers novaHelpers;
 
     @Before
     public void setUp() throws Exception {
@@ -53,6 +53,8 @@ public class NovaComputeTest {
         System.out.println("imageApi = " + imageApi);
         this.serverApi = novaApi.getServerApiForZone(zone);
         System.out.println("serverApi = " + serverApi);
+        
+        this.novaHelpers = new NovaHelpers(flavorApi, imageApi, serverApi);
     }
 
     @After
@@ -126,8 +128,8 @@ public class NovaComputeTest {
         final String flavorRef = flavorApi.list().iterator().next().iterator().next().getId();
         final CreateServerOptions defaultOptions = new CreateServerOptions().adminPass("foobar");
         final ServerCreated serverCreated = serverApi.create("foobar", imageRef, flavorRef, defaultOptions);
-        final String serverId = serverCreated.getId();
-        System.out.println("serverId = " + serverId);
+        final String serverID = serverCreated.getId();
+        System.out.println("serverID = " + serverID);
         final String serverName = serverCreated.getName();
         System.out.println("serverName = " + serverName);
         final Optional<String> serverAdminPass = serverCreated.getAdminPass();
@@ -137,16 +139,22 @@ public class NovaComputeTest {
             System.out.println("serverLink = " + serverLink);
         }
 
-        System.out.println("Sleeping...");
-        Thread.sleep(10000L);
-        final Server server = serverApi.get(serverId);
-        final Date dateCreated = server.getCreated();
-        System.out.println("dateCreated = " + dateCreated);
-        final Server.Status status = server.getStatus();
-        System.out.println("status = " + status);
+        System.out.println("Waiting for server to be fully active...");
+        final Proc<Server.Status> waitActiveStep = new Proc<Server.Status>() {
+            @Override
+            public void apply(Server.Status status) {
+                System.out.println("Waiting until " + Server.Status.ACTIVE + ", status = " + status);
+            }
+        };
+        novaHelpers.waitServerStatus(serverID, Server.Status.ACTIVE, 5000L, waitActiveStep);
 
-        System.out.println("Back to business, deleting server " + serverId);
-        final boolean deleted = serverApi.delete(serverId);
-        System.out.println("deleted = " + deleted);
+        System.out.println("Deleting server " + serverID);
+        final Proc<Server.Status> waitDeletedStep = new Proc<Server.Status>() {
+            @Override
+            public void apply(Server.Status status) {
+                System.out.println("Waiting until " + Server.Status.DELETED + ", status = " + status);
+            }
+        };
+        novaHelpers.deleteServerAndWait(serverID, 5000L, waitDeletedStep);
     }
 }
