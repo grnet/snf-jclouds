@@ -1,9 +1,8 @@
 package org.synnefo.jclouds;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.FluentIterable;
 import org.jclouds.ContextBuilder;
-import org.jclouds.collect.IterableWithMarker;
-import org.jclouds.collect.PagedIterable;
 import org.jclouds.openstack.nova.v2_0.NovaApi;
 import org.jclouds.openstack.nova.v2_0.domain.Flavor;
 import org.jclouds.openstack.nova.v2_0.domain.Image;
@@ -64,61 +63,49 @@ public class NovaComputeTest {
 
     @Test
     public void test_001_flavors() {
-        final PagedIterable<? extends Resource> flavorsList = flavorApi.list();
-        for(IterableWithMarker<? extends Resource> flavors : flavorsList) {
-            for(Resource flavor : flavors) {
-                System.out.println("resource = " + flavor);
-            }
+        final FluentIterable<? extends Resource> flavors = flavorApi.list().concat();
+        for(Resource flavor : flavors) {
+            System.out.println("flavor = " + flavor);
         }
     }
 
     @Test
     public void test_002_flavors_in_detail() {
-        final PagedIterable<? extends Flavor > flavorsList = flavorApi.listInDetail();
-        for(IterableWithMarker<? extends Flavor> flavors : flavorsList) {
-            for(Flavor flavor : flavors) {
-                System.out.println("flavor = " + flavor);
-            }
+        final FluentIterable<? extends Flavor> flavors = flavorApi.listInDetail().concat();
+        for(Flavor flavor : flavors) {
+            System.out.println("flavor = " + flavor);
         }
     }
 
     @Test
     public void test_003_images() {
-        final PagedIterable<? extends Resource> imagesList = imageApi.list();
-        for(IterableWithMarker<? extends Resource> images : imagesList) {
-            for(Resource image : images) {
-                System.out.println("image = " + image);
-            }
+        final FluentIterable<? extends Resource> images = imageApi.list().concat();
+        for(Resource image : images) {
+            System.out.println("image = " + image);
         }
     }
 
     @Test
     public void test_004_images_in_detail() {
-        final PagedIterable<? extends Image> imagesList = imageApi.listInDetail();
-        for(IterableWithMarker<? extends Image> images : imagesList) {
-            for(Image image : images) {
-                System.out.println("image = " + image);
-            }
+        final FluentIterable<? extends Image> images = imageApi.listInDetail().concat();
+        for(Image image : images) {
+            System.out.println("image = " + image);
         }
     }
 
     @Test
     public void test_005_servers() {
-        final PagedIterable<? extends Resource> serversList = serverApi.list();
-        for(IterableWithMarker<? extends Resource> servers : serversList) {
-            for(Resource server : servers) {
-                System.out.println("server = " + server);
-            }
+        final FluentIterable<? extends Resource> servers = serverApi.list().concat();
+        for(Resource server : servers) {
+            System.out.println("server = " + server);
         }
     }
 
     @Test
     public void test_006_servers_in_detail() {
-        final PagedIterable<? extends Server> serversList = serverApi.listInDetail();
-        for(IterableWithMarker<? extends Server> servers : serversList) {
-            for(Server server : servers) {
-                System.out.println("server = " + server);
-            }
+        final FluentIterable<? extends Server> servers = serverApi.listInDetail().concat();
+        for(Server server : servers) {
+            System.out.println("server = " + server);
         }
     }
 
