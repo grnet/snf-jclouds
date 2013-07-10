@@ -30,7 +30,7 @@ public class NovaComputeTest {
     private FlavorApi flavorApi;
     private ImageApi imageApi;
     private ServerApi serverApi;
-    private NovaHelpers novaHelpers;
+    private NovaServerApiHelpers novaServerApiHelpers;
 
     @Before
     public void setUp() throws Exception {
@@ -53,7 +53,7 @@ public class NovaComputeTest {
         this.serverApi = novaApi.getServerApiForZone(zone);
         System.out.println("serverApi = " + serverApi);
         
-        this.novaHelpers = new NovaHelpers(flavorApi, imageApi, serverApi);
+        this.novaServerApiHelpers = new NovaServerApiHelpers(serverApi);
     }
 
     @After
@@ -133,7 +133,7 @@ public class NovaComputeTest {
                 System.out.println("Waiting until " + Server.Status.ACTIVE + ", status = " + status);
             }
         };
-        novaHelpers.waitServerStatus(serverID, Server.Status.ACTIVE, 5000L, waitActiveStep);
+        novaServerApiHelpers.waitServerStatus(serverID, Server.Status.ACTIVE, 5000L, waitActiveStep);
 
         System.out.println("Deleting server " + serverID);
         final Proc<Server.Status> waitDeletedStep = new Proc<Server.Status>() {
@@ -142,6 +142,6 @@ public class NovaComputeTest {
                 System.out.println("Waiting until " + Server.Status.DELETED + ", status = " + status);
             }
         };
-        novaHelpers.deleteServerAndWait(serverID, 5000L, waitDeletedStep);
+        novaServerApiHelpers.deleteServerAndWait(serverID, 5000L, waitDeletedStep);
     }
 }

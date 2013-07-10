@@ -26,6 +26,7 @@ import java.util.Set;
 public class ComputeTest {
     private ComputeServiceContext computeContext;
     private ComputeService computeService;
+    private ComputeHelpers computeHelpers;
 
     @Before
     public void setUp() throws Exception {
@@ -37,6 +38,7 @@ public class ComputeTest {
             buildView(ComputeServiceContext.class);
 
         this.computeService = this.computeContext.getComputeService();
+        this.computeHelpers = new ComputeHelpers(computeService);
     }
 
     @After
@@ -56,12 +58,7 @@ public class ComputeTest {
     }
 
     @Test
-    public void test_001_getComputeService() {
-        //this.computeService = this.computeContext.getComputeService();
-    }
-
-    @Test
-    public void test_002_listNodes() {
+    public void test_001_nodes() {
         final Set<? extends ComputeMetadata> nodes = this.computeService.listNodes();
         for(ComputeMetadata node : nodes) {
             System.out.println("Node: " + node);
@@ -69,7 +66,7 @@ public class ComputeTest {
     }
 
     @Test
-    public void test_003_listImages() {
+    public void test_002_images() {
         final Set<? extends Image> images = this.computeService.listImages();
         for(Image image : images) {
             System.out.println("Image:  " + image);
@@ -77,7 +74,7 @@ public class ComputeTest {
     }
 
     @Test
-    public void test_004_listHardwareProfiles() {
+    public void test_003_hardware_profiles() {
         // flavors
         final Set<? extends Hardware> hwProfiles = this.computeService.listHardwareProfiles();
         for(Hardware hwProfile : hwProfiles) {
@@ -86,7 +83,7 @@ public class ComputeTest {
     }
 
     @Test
-    public void test_005_listAssignableLocations() {
+    public void test_004_assignable_locations() {
         final Set<? extends Location> assignableLocations = this.computeService.listAssignableLocations();
         for(Location assignableLocation : assignableLocations) {
             System.out.println("Assignable Location: " + assignableLocation);
@@ -94,7 +91,7 @@ public class ComputeTest {
     }
 
     @Test
-    public void test_006_templateBuilder() {
+    public void test_005_template_builder() {
         final String imageId = this.computeService.listImages().iterator().next().getId();
         System.out.println(" Image ID: " + imageId);
         final TemplateBuilder templateBuilder = this.computeService.templateBuilder();
@@ -121,7 +118,7 @@ public class ComputeTest {
     }
 
     @Test
-    public void test_007_createNode() throws RunNodesException {
+    public void test_007_node_create_delete() throws RunNodesException, InterruptedException {
         final String imageId = this.computeService.listImages().iterator().next().getId();
         System.out.println("Image ID: " + imageId);
         final TemplateBuilder templateBuilder = this.computeService.templateBuilder();
@@ -130,11 +127,23 @@ public class ComputeTest {
         System.out.println("Creating a new VM");
         final Set<? extends NodeMetadata> nodes = this.computeService.createNodesInGroup("snf-jclouds-testgen", 1, template);
         final NodeMetadata node = nodes.iterator().next(); // we had just one
-        System.out.println("VM: " + node);
-        System.out.println("Destroying the VM");
-        this.computeService.destroyNode(node.getId());
+        final String nodeID = node.getId();
 
-        // We check that the node is indeed destroyed by requesting its metadata (and getting nothing back).
-        final NodeMetadata checkNode = this.computeService.getNodeMetadata(node.getId());
+        System.out.println("Waiting for server to be fully active...");
+        computeHelpers.waitNodeStatus(nodeID, NodeMetadata.Status.RUNNING, 5000L, new Proc<NodeMetadata.Status>() {
+            @Override
+            public void apply(NodeMetadata.Status status) {
+                System.out.println("Waiting until " + NodeMetadata.Status.RUNNING + ", status = " + status);
+            }
+        });
+
+
+        System.out.println("Destroying node " + nodeID);
+        computeHelpers.destroyNodeAndWait(nodeID, 5000L, new Proc<NodeMetadata.Status>() {
+            @Override
+            public void apply(NodeMetadata.Status status) {
+                System.out.println("Waiting until node is destroyed, status = " + status);
+            }
+        });
     }
 }
