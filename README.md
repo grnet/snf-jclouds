@@ -1,4 +1,4 @@
 snf-jclouds
 ===========
 
-We use the jClouds OpenStack API to test the compliance of [Synnefo](http://synnefo.org) against OpenStack v2.0
+We use the jClouds OpenStack API to test the compatibility of [Synnefo](http://synnefo.org) with OpenStack v2.0
