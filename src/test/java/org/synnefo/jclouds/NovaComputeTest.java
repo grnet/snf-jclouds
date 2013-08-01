@@ -1,6 +1,5 @@
 package org.synnefo.jclouds;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
