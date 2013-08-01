@@ -3,8 +3,6 @@ package org.synnefo.jclouds;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
-import org.jclouds.ContextBuilder;
-import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
 
 /**
@@ -33,14 +31,17 @@ public final class Environment {
 
 
 
-    public static final Iterable<Module> Modules = ImmutableSet.<Module> of(new SLF4JLoggingModule());
+    public static final Iterable<Module> Modules = ImmutableSet.<Module> of(
+        new SLF4JLoggingModule()/*,
+        new SshjSshClientModule()*/
+    );
 
-    public static final ComputeServiceContext Context = ContextBuilder.newBuilder(JCloudsProvider).
-        endpoint(SnfEndpoint).
-        credentials(SnfUserUUID, SnfUserToken).
-        modules(Modules).
-        apiVersion(APIVersion).
-        buildView(ComputeServiceContext.class);
+//    public static final ComputeServiceContext Context = ContextBuilder.newBuilder(JCloudsProvider).
+//        endpoint(SnfEndpoint).
+//        credentials(SnfUserUUID, SnfUserToken).
+//        modules(Modules).
+//        apiVersion(APIVersion).
+//        buildView(ComputeServiceContext.class);
 
     private static void checkAndComplain(String name, String value) {
         if(value == null) {

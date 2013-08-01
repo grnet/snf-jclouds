@@ -3,7 +3,10 @@ package org.synnefo.jclouds;
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import org.jclouds.ContextBuilder;
+import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.openstack.nova.v2_0.NovaApi;
+import org.jclouds.openstack.nova.v2_0.NovaAsyncApi;
 import org.jclouds.openstack.nova.v2_0.domain.Flavor;
 import org.jclouds.openstack.nova.v2_0.domain.Image;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
@@ -14,6 +17,7 @@ import org.jclouds.openstack.nova.v2_0.features.ServerApi;
 import org.jclouds.openstack.nova.v2_0.options.CreateServerOptions;
 import org.jclouds.openstack.v2_0.domain.Link;
 import org.jclouds.openstack.v2_0.domain.Resource;
+import org.jclouds.rest.RestContext;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
 
@@ -34,12 +38,25 @@ public class NovaComputeTest {
 
     @Before
     public void setUp() throws Exception {
-        this.novaApi = ContextBuilder.newBuilder(Environment.JCloudsProvider).
+        ComputeServiceContext context = ContextBuilder.newBuilder(Environment.JCloudsProvider).
             endpoint(Environment.SnfEndpoint).
             credentials(Environment.SnfUserUUID, Environment.SnfUserToken).
             modules(Environment.Modules).
             apiVersion(Environment.APIVersion).
-            buildApi(NovaApi.class);
+            buildView(ComputeServiceContext.class);
+
+        ComputeService compute = context.getComputeService();
+        RestContext<NovaApi, NovaAsyncApi> nova = context.unwrap();
+        this.novaApi = nova.getApi();
+
+
+        // This is jClouds 1.6.0
+//        this.novaApi = ContextBuilder.newBuilder(Environment.JCloudsProvider).
+//            endpoint(Environment.SnfEndpoint).
+//            credentials(Environment.SnfUserUUID, Environment.SnfUserToken).
+//            modules(Environment.Modules).
+//            apiVersion(Environment.APIVersion).
+//            buildApi(NovaApi.class);
 
         final Set<String> zones = novaApi.getConfiguredZones();
         final String zone = zones.iterator().next();
@@ -58,7 +75,8 @@ public class NovaComputeTest {
 
     @After
     public void tearDown() throws Exception {
-        this.novaApi.close();
+        // This is jClouds 1.6.0 API
+//        this.novaApi.close();
     }
 
     @Test
@@ -119,7 +137,10 @@ public class NovaComputeTest {
         System.out.println("serverID = " + serverID);
         final String serverName = serverCreated.getName();
         System.out.println("serverName = " + serverName);
-        final Optional<String> serverAdminPass = serverCreated.getAdminPass();
+        // This is jClouds 1.6.0 API
+//        final Optional<String> serverAdminPass = serverCreated.getAdminPass();
+        final String serverAdminPass = serverCreated.getAdminPass();
+
         System.out.println("serverAdminPass = " + serverAdminPass);
         final Set<Link> serverLinks = serverCreated.getLinks();
         for(Link serverLink : serverLinks) {
