@@ -138,6 +138,7 @@ public class NovaComputeTest {
         System.out.println("serverName = " + serverName);
         // This is jClouds 1.6.0 API
 //        final Optional<String> serverAdminPass = serverCreated.getAdminPass();
+        // This is jClouds 1.5.5 API
         final String serverAdminPass = serverCreated.getAdminPass();
 
         System.out.println("serverAdminPass = " + serverAdminPass);
